@@ -23,20 +23,23 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _batteryLevel;
+  String _batteryLevel = 'Unknown';
+  static const platform = MethodChannel('native.flutter.dev/battery');
 
   Future<void> _getBatteryLevel() async {
-    const platform = MethodChannel('course.flutter.dev/battery');
+    String batteryLevel;
     try {
-      final batteryLevel = await platform.invokeMethod('getBatteryLevel');
-      setState(() {
-        _batteryLevel = batteryLevel;
-      });
+      final int result = await platform.invokeMethod('getBatteryLevel');
+      batteryLevel = '$result %';
     } on PlatformException catch (error) {
       setState(() {
-        _batteryLevel = null;
+        batteryLevel = 'Failed to get battery level: ${error.message}.';
       });
     }
+
+    setState(() {
+      _batteryLevel = batteryLevel;
+    });
   }
 
   @override
@@ -51,7 +54,18 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('Native Code'),
       ),
       body: Center(
-        child: Text('Battery Level: $_batteryLevel'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: _getBatteryLevel,
+              child: Text(
+                'Get battery Level',
+              ),
+            ),
+            Text(_batteryLevel),
+          ],
+        ),
       ),
     );
   }
