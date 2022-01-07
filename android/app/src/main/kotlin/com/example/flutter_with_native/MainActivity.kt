@@ -24,7 +24,6 @@ class MainActivity: FlutterActivity() {
             call, result ->
                 if (call.method == "getBatteryLevel") {
                     val batteryLevel = getBatteryLevel()
-
                     if (batteryLevel != -1) {
                     result.success(batteryLevel)
                     } else {
